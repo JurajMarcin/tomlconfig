@@ -62,7 +62,7 @@ def _update(self: object, toml_dict: TomlDict) -> None:
 
 
 def parse(cls: Type[T], conf_path: str | None = None,
-          conf_d_path: str | None = None) -> T:
+          conf_d_path: str | None = None, ignore_missing: bool = False) -> T:
     """
     Parses config file into configclass of type cls
     """
@@ -82,7 +82,8 @@ def parse(cls: Type[T], conf_path: str | None = None,
         if validator is not None:
             validator(self)
     except FileNotFoundError:
-        pass
+        if not ignore_missing:
+            raise
     except ConfigError as ex:
         raise ConfigError(f"In file {file_path}: {ex}") from ex
     except TOMLDecodeError as ex:

@@ -1,6 +1,7 @@
 """Module for parsing TOML configuration to a configclass"""
 from dataclasses import dataclass, fields
-import os
+from os import listdir
+from os.path import isfile, join
 from types import UnionType
 from typing import Any, Callable, Type, TypeVar, overload
 
@@ -75,8 +76,10 @@ def parse(cls: Type[T], conf_path: str | None = None,
             with open(conf_path, "rb") as file:
                 _update(self, load(file))
         if conf_d_path is not None:
-            for file_path in sorted(os.listdir(conf_d_path)):
-                with open(os.path.join(conf_d_path, file_path), "rb") as file:
+            for file_path in sorted(listdir(conf_d_path)):
+                if not isfile(file_path):
+                    continue
+                with open(join(conf_d_path, file_path), "rb") as file:
                     _update(self, load(file))
         validator = getattr(self, VALIDATE_DUNDER, None)
         if validator is not None:
